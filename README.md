@@ -27,6 +27,8 @@ protected void onCreate(Bundle savedInstanceState){
 ```
 The initial injection happens through property injection. From there on out the dependency tree is resolved through constructor injection.
 
+The repo contains an example app to show usage in more detail.
+
 ## Multiple lifecycle support
 Jinjectsu supports *transient*, *singleton*, *instance* and *scoped* type registrations.
 
