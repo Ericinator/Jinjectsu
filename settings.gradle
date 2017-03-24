@@ -1,1 +1,1 @@
-include ':app', ':jinjectsu2', ':jinjectsu'
+include ':app', ':jinjectsu', ':jinjectsutest'

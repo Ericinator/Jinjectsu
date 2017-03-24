@@ -2,10 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Jinjectsu.iml" filepath="$PROJECT_DIR$/Jinjectsu.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/jinjectsu/jinjectsu.iml" filepath="$PROJECT_DIR$/jinjectsu/jinjectsu.iml" />
       <module fileurl="file://$PROJECT_DIR$/jinjectsu2/jinjectsu2.iml" filepath="$PROJECT_DIR$/jinjectsu2/jinjectsu2.iml" />
       <module fileurl="file://$PROJECT_DIR$/jinjectsudemo.iml" filepath="$PROJECT_DIR$/jinjectsudemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jinjectsutest/jinjectsutest.iml" filepath="$PROJECT_DIR$/jinjectsutest/jinjectsutest.iml" />
     </modules>
   </component>
 </project>
