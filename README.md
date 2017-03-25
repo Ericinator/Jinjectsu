@@ -59,4 +59,16 @@ container.endScope();
 ```
 *Please note that the code snippet above is a terrible example of how to use this container. Calling the resolve method manually most likely indicates incorrect usage.*
 
+## Unit test setup
+Jinjectsu provides the *validateTypeRegistration* helper to help you ensure that your container is not missing any dependency registrations.
 
+```Java
+@Test
+public void givenJinjectsuContainer_WhenValidatingRegistration_ReturnsValid() {
+    Jinjectsu yourJinjectsuContainer = yourJinectsuSetupMethod();
+
+    boolean validRegistration = yourJinjectsuContainer.validateTypeRegistration();
+
+    Assert.assertTrue(validRegistration);
+}
+```
