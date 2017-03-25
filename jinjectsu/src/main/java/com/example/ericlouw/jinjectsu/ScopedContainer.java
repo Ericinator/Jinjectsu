@@ -3,6 +3,7 @@ package com.example.ericlouw.jinjectsu;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 public class ScopedContainer implements  ITypeResolver {
@@ -42,5 +43,15 @@ public class ScopedContainer implements  ITypeResolver {
     @Override
     public Object resolve(Class abstractType, Jinjectsu jinjectsu) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         return this.getCurrentScope().resolve(abstractType, jinjectsu);
+    }
+
+    @Override
+    public boolean isTypeRegistered(Class type) {
+        return this.typeMap.containsKey(type);
+    }
+
+    @Override
+    public Set<Class> getRegisteredTypes() {
+        return this.typeMap.keySet();
     }
 }

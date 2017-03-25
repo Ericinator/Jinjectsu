@@ -3,6 +3,7 @@ package com.example.ericlouw.jinjectsu;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import exceptions.UnregisteredTypeException;
 
@@ -42,5 +43,15 @@ class SingletonContainer implements ITypeResolver {
         }
 
         return this.singletonLookup.get(abstractType);
+    }
+
+    @Override
+    public boolean isTypeRegistered(Class type) {
+        return this.singletonTypeMap.containsKey(type);
+    }
+
+    @Override
+    public Set<Class> getRegisteredTypes() {
+        return this.singletonTypeMap.keySet();
     }
 }

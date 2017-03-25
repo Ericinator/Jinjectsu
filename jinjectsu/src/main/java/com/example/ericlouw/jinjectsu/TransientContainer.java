@@ -4,6 +4,7 @@ package com.example.ericlouw.jinjectsu;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import exceptions.UnregisteredTypeException;
 
@@ -29,5 +30,15 @@ class TransientContainer implements ITypeResolver
         }
 
         throw new UnregisteredTypeException(String.format("Type {0} was not registered transiently.", abstractType.getName()));
+    }
+
+    @Override
+    public boolean isTypeRegistered(Class type) {
+        return this.concreteTypeMap.containsKey(type);
+    }
+
+    @Override
+    public Set<Class> getRegisteredTypes() {
+        return this.concreteTypeMap.keySet();
     }
 }

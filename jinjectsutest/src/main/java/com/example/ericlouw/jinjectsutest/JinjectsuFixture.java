@@ -260,4 +260,31 @@ public class JinjectsuFixture {
             Assert.assertTrue(true);
         }
     }
+
+    @Test
+    public void givenJinjectsuWithMissingRegistrations_WhenValidatingRegistration_ReturnsInvalid() {
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu
+                .bind(ITestInterfaceA.class).lifestyleTransient(TestConcreteA.class)
+                .bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class);
+
+        boolean validRegistrations = jinjectsu.validateTypeRegistration();
+
+        Assert.assertFalse(validRegistrations);
+    }
+
+    @Test
+    public void givenJinjectsuWithCompleteRegistrations_WhenValidatingRegistration_ReturnsValid() {
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu
+                .bind(ITestInterfaceA.class).lifestyleTransient(TestConcreteA.class)
+                .bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class)
+                .bind(ITestInterfaceC.class).lifestyleTransient(TestConcreteC.class);
+
+        boolean validRegistrations = jinjectsu.validateTypeRegistration();
+
+        Assert.assertTrue(validRegistrations);
+    }
 }

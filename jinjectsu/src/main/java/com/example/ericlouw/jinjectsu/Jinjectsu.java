@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -86,6 +88,27 @@ public class Jinjectsu {
 
     public void endScope(){
         this.scopedContainer.pop();
+    }
+
+    public boolean validateTypeRegistration(){
+        Set<Class> allRegisteredTypes = new HashSet<>();
+
+        allRegisteredTypes.addAll(this.singletonContainer.getRegisteredTypes());
+        allRegisteredTypes.addAll(this.transientContainer.getRegisteredTypes());
+        allRegisteredTypes.addAll(this.instanceContainer.getRegisteredTypes());
+        allRegisteredTypes.addAll(this.scopedContainer.getRegisteredTypes());
+
+        for(Class type : allRegisteredTypes){
+            try {
+                this.resolve(type);
+            }
+            catch(Exception e){
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        return true;
     }
 
     <TConcrete> void registerInstance(Class abstractType, TConcrete instance) {
