@@ -2,11 +2,16 @@ package com.example.ericlouw.jinjectsu;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+
+import exceptions.ConstructorResolutionException;
+import exceptions.InjectionException;
+import exceptions.UnregisteredTypeException;
 
 public class Jinjectsu {
     private InstanceContainer instanceContainer;
@@ -43,8 +48,8 @@ public class Jinjectsu {
 
             try {
                 field.set(target, this.resolve(field.getType()));
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                throw new InjectionException(String.format("Could not inject property %s of type %s because it is inaccessible.", field.getName(), target.getClass().getName()), e);
             }
         }
 
@@ -54,17 +59,25 @@ public class Jinjectsu {
         return new TypeBinder(abstractType, this);
     }
 
-    public <TInterface> TInterface resolve(Class abstractType) throws Exception {
+    public <TInterface> TInterface resolve(Class abstractType)  {
         if (!this.registrationTypeMap.containsKey(abstractType))
         {
-            throw new Exception(String.format("Type %s is not registered.", abstractType.getName()));
+            throw new UnregisteredTypeException(String.format("Type %s was not registered.", abstractType.getName()));
         }
 
         RegistrationType registrationType = this.registrationTypeMap.get(abstractType);
 
         ITypeResolver resolver = this.resolverMap.get(registrationType);
 
-        return (TInterface)(resolver.resolve(abstractType, this));
+        try {
+            return (TInterface)(resolver.resolve(abstractType, this));
+        } catch (InstantiationException e) {
+            throw new ConstructorResolutionException(String.format("An error occurred while resolving type {%s}.", abstractType.getName()), e);
+        } catch (IllegalAccessException e) {
+            throw new ConstructorResolutionException(String.format("Could not constructor inject type {%s} because its constructor is inaccessible.", abstractType.getName()), e);
+        } catch (InvocationTargetException e) {
+            throw new ConstructorResolutionException(String.format("An error occurred while resolving type {%s}.", abstractType.getName()), e);
+        }
     }
 
     public void beginScope(){
@@ -80,31 +93,31 @@ public class Jinjectsu {
         this.instanceContainer.register(abstractType, instance);
     }
 
-    void registerTransient(Class abstractType, Class concreteType) throws Exception {
+    void registerTransient(Class abstractType, Class concreteType) {
         this.cyclicDependencyChecker.registerDependency(abstractType, Arrays.asList(this.getConstructorDependenciesForType(concreteType)));
         this.registrationTypeMap.put(abstractType, RegistrationType.TRANSIENT);
         this.transientContainer.register(abstractType, concreteType);
     }
 
-    void registerSingleton(Class abstractType, Class concreteType) throws Exception {
+    void registerSingleton(Class abstractType, Class concreteType) {
         this.cyclicDependencyChecker.registerDependency(abstractType, Arrays.asList(this.getConstructorDependenciesForType(concreteType)));
         this.registrationTypeMap.put(abstractType, RegistrationType.SINGLETON);
         this.singletonContainer.register(abstractType, concreteType);
     }
 
-    void registerScoped(Class abstractType, Class concreteType) throws Exception {
+    void registerScoped(Class abstractType, Class concreteType) {
         this.cyclicDependencyChecker.registerDependency(abstractType, Arrays.asList(this.getConstructorDependenciesForType(concreteType)));
         this.registrationTypeMap.put(abstractType, RegistrationType.SCOPED);
         this.scopedContainer.register(abstractType, concreteType);
     }
 
-    Object ConstructorResolve(Class type) throws Exception {
+    Object ConstructorResolve(Class type) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor constructor = type.getDeclaredConstructors()[0];
 
         Class[] parameterTypes = constructor.getParameterTypes();
 
         if(parameterTypes.length == 0){
-            return constructor.newInstance();
+           return constructor.newInstance();
         }
 
         Object[] parameterValues = new Object[parameterTypes.length];
@@ -121,4 +134,5 @@ public class Jinjectsu {
 
         return constructor.getParameterTypes();
     }
+
 }

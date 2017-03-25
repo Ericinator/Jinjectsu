@@ -5,11 +5,14 @@ import com.example.ericlouw.jinjectsu.Jinjectsu;
 import org.junit.Assert;
 import org.junit.Test;
 
+import exceptions.ConstructorResolutionException;
+import exceptions.CyclicDependencyException;
+
 
 public class JinjectsuFixture {
 
     @Test
-    public void givenJinjectsu_WhenResolvingUnboundType_ThrowsException(){
+    public void givenJinjectsu_WhenResolvingUnboundType_ThrowsException() {
         Jinjectsu jinjectsu = new Jinjectsu();
         try {
             jinjectsu.resolve(ITestInterfaceA.class);
@@ -36,7 +39,7 @@ public class JinjectsuFixture {
     }
 
     @Test
-    public void givenJinjectsu_WhenBindingTransient_ResolvesTreeCorrectly() throws Exception{
+    public void givenJinjectsu_WhenBindingTransient_ResolvesTreeCorrectly() throws Exception {
         Jinjectsu jinjectsu = new Jinjectsu();
 
         jinjectsu
@@ -52,7 +55,7 @@ public class JinjectsuFixture {
     }
 
     @Test
-    public void givenJinjectsu_WhenBindingTransientAndInstance_ResolvesTreeCorrectly() throws Exception{
+    public void givenJinjectsu_WhenBindingTransientAndInstance_ResolvesTreeCorrectly() throws Exception {
         Jinjectsu jinjectsu = new Jinjectsu();
 
         ITestInterfaceC testC = new TestConcreteC();
@@ -71,7 +74,7 @@ public class JinjectsuFixture {
     }
 
     @Test
-    public void givenJinjectsu_WhenBindingSingleton_ResolvesTSameInstance() throws Exception{
+    public void givenJinjectsu_WhenBindingSingleton_ResolvesTSameInstance() throws Exception {
         Jinjectsu jinjectsu = new Jinjectsu();
 
         jinjectsu
@@ -86,7 +89,7 @@ public class JinjectsuFixture {
     }
 
     @Test
-    public void givenJinjectsu_WhenBindingScoped_ResolvesTSameInstanceWithinScope() throws Exception{
+    public void givenJinjectsu_WhenBindingScoped_ResolvesTSameInstanceWithinScope() throws Exception {
         Jinjectsu jinjectsu = new Jinjectsu();
 
         jinjectsu
@@ -111,19 +114,19 @@ public class JinjectsuFixture {
     }
 
     @Test
-    public void givenJinjectsu_WhenResolvingNestedScopes_ResolvesSameInstanceWithinScope() throws Exception{
+    public void givenJinjectsu_WhenResolvingNestedScopes_ResolvesSameInstanceWithinScope() throws Exception {
         Jinjectsu jinjectsu = new Jinjectsu();
 
         jinjectsu
                 .bind(ITestInterfaceC.class).lifeStyleScoped(TestConcreteC.class);
 
         jinjectsu.beginScope();
-            ITestInterfaceC resolved1 = jinjectsu.resolve(ITestInterfaceC.class);
-            ITestInterfaceC resolved2 = jinjectsu.resolve(ITestInterfaceC.class);
+        ITestInterfaceC resolved1 = jinjectsu.resolve(ITestInterfaceC.class);
+        ITestInterfaceC resolved2 = jinjectsu.resolve(ITestInterfaceC.class);
 
-            jinjectsu.beginScope();
-                ITestInterfaceC resolved3 = jinjectsu.resolve(ITestInterfaceC.class);
-            jinjectsu.endScope();
+        jinjectsu.beginScope();
+        ITestInterfaceC resolved3 = jinjectsu.resolve(ITestInterfaceC.class);
+        jinjectsu.endScope();
         jinjectsu.endScope();
 
         Assert.assertNotNull(resolved1);
@@ -169,7 +172,7 @@ public class JinjectsuFixture {
 
         jinjectsu.inject(model);
 
-        TestModel castedModel = (TestModel)model;
+        TestModel castedModel = (TestModel) model;
 
         Assert.assertNotNull(castedModel.getTestObjectA());
         Assert.assertNotNull(castedModel.getTestObjectB());
@@ -180,7 +183,7 @@ public class JinjectsuFixture {
     }
 
     @Test
-    public void givenClassesWithCyclicDependency_WhenRegisterTransiently_ThrowsException(){
+    public void givenClassesWithCyclicDependency_WhenRegisterTransiently_ThrowsException() {
         Jinjectsu jinjectsu = new Jinjectsu();
 
         try {
@@ -195,7 +198,7 @@ public class JinjectsuFixture {
     }
 
     @Test
-    public void givenClassesWithCyclicDependency_WhenRegisterSingleton_ThrowsException(){
+    public void givenClassesWithCyclicDependency_WhenRegisterSingleton_ThrowsException() {
         Jinjectsu jinjectsu = new Jinjectsu();
 
         try {
@@ -210,7 +213,7 @@ public class JinjectsuFixture {
     }
 
     @Test
-    public void givenClassesWithCyclicDependency_WhenRegisterScoped_ThrowsException(){
+    public void givenClassesWithCyclicDependency_WhenRegisterScoped_ThrowsCyclicDependencyException() {
         Jinjectsu jinjectsu = new Jinjectsu();
 
         try {
@@ -220,9 +223,41 @@ public class JinjectsuFixture {
                     .bind(ICyclicDependencyB.class).lifestyleSingleton(CyclicDependencyB.class);
 
             Assert.assertTrue(false);
-        } catch (Exception e) {
+        } catch (CyclicDependencyException e) {
             Assert.assertTrue(true);
+        } catch (Exception exception) {
+            Assert.assertTrue(false);
         }
         jinjectsu.endScope();
+    }
+
+    @Test
+    public void givenDependencyWithInaccessibleConstructor_WhenResolving_ThrowsConstructorResolutionException() {
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu.bind(DependencyWithPrivateConstructor.class).lifestyleSingleton(DependencyWithPrivateConstructor.class);
+
+        try {
+            DependencyWithPrivateConstructor resolvedDependency = jinjectsu.resolve(DependencyWithPrivateConstructor.class);
+            Assert.assertTrue(false);
+        }
+        catch(ConstructorResolutionException e){
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void givenDependencyWithErrorInConstructor_WhenResolving_ThrowsConstructorResolutionException() {
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu.bind(DependencyWithConstructorException.class).lifestyleSingleton(DependencyWithConstructorException.class);
+
+        try {
+            DependencyWithPrivateConstructor resolvedDependency = jinjectsu.resolve(DependencyWithConstructorException.class);
+            Assert.assertTrue(false);
+        }
+        catch(ConstructorResolutionException e){
+            Assert.assertTrue(true);
+        }
     }
 }

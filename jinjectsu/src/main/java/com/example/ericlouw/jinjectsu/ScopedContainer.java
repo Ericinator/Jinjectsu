@@ -1,5 +1,6 @@
 package com.example.ericlouw.jinjectsu;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -39,7 +40,7 @@ public class ScopedContainer implements  ITypeResolver {
     }
 
     @Override
-    public Object resolve(Class abstractType, Jinjectsu jinjectsu) throws Exception {
+    public Object resolve(Class abstractType, Jinjectsu jinjectsu) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         return this.getCurrentScope().resolve(abstractType, jinjectsu);
     }
 }

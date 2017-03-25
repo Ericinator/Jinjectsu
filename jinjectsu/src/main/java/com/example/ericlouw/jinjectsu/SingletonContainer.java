@@ -1,7 +1,10 @@
 package com.example.ericlouw.jinjectsu;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+
+import exceptions.UnregisteredTypeException;
 
 class SingletonContainer implements ITypeResolver {
     private Map<Class, Object> singletonLookup;
@@ -19,18 +22,18 @@ class SingletonContainer implements ITypeResolver {
         this.singletonTypeMap.put(abstractType, concreteType);
     }
 
-    private Object CreateSingleton(Class abstractClass, Jinjectsu jinjectsu) throws Exception {
+    private Object CreateSingleton(Class abstractClass, Jinjectsu jinjectsu) throws IllegalAccessException, InstantiationException, InvocationTargetException {
 
         if (this.singletonTypeMap.containsKey(abstractClass)) {
             Class concreteClass = this.singletonTypeMap.get(abstractClass);
             return jinjectsu.ConstructorResolve(concreteClass);
         }
 
-        throw new Exception(String.format("Type %s was not registered as a singleton.", abstractClass.getName()));
+        throw new UnregisteredTypeException(String.format("Type %s was not registered as a singleton.", abstractClass.getName()));
     }
 
     @Override
-    public Object resolve(Class abstractType, Jinjectsu jinjectsu) throws Exception {
+    public Object resolve(Class abstractType, Jinjectsu jinjectsu) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         boolean singletonExists = this.singletonLookup.containsKey(abstractType);
 
         if (!singletonExists)

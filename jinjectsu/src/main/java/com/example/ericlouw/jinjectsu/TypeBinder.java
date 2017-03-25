@@ -16,19 +16,19 @@ class TypeBinder implements ITypeBinder{
     }
 
     @Override
-    public Jinjectsu lifestyleSingleton(Class concreteType) throws Exception {
+    public Jinjectsu lifestyleSingleton(Class concreteType) {
         this.jinjectsu.registerSingleton(this.abstractType, concreteType);
         return this.jinjectsu;
     }
 
     @Override
-    public Jinjectsu lifeStyleScoped(Class concreteType) throws Exception {
+    public Jinjectsu lifeStyleScoped(Class concreteType) {
         this.jinjectsu.registerScoped(this.abstractType, concreteType);
         return this.jinjectsu;
     }
 
     @Override
-    public Jinjectsu lifestyleTransient(Class concreteType) throws Exception {
+    public Jinjectsu lifestyleTransient(Class concreteType) {
         this.jinjectsu.registerTransient(this.abstractType, concreteType);
         return this.jinjectsu;
     }

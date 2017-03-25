@@ -1,8 +1,11 @@
 package com.example.ericlouw.jinjectsu;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+
+import exceptions.UnregisteredTypeException;
 
 class TransientContainer implements ITypeResolver
 {
@@ -19,12 +22,12 @@ class TransientContainer implements ITypeResolver
     }
 
     @Override
-    public Object resolve(Class abstractType, Jinjectsu jinjectsu) throws Exception {
+    public Object resolve(Class abstractType, Jinjectsu jinjectsu) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         if (this.concreteTypeMap.containsKey(abstractType))
         {
             return jinjectsu.ConstructorResolve(this.concreteTypeMap.get(abstractType));
         }
 
-        throw new Exception(String.format("Type {0} was not registered transiently.", abstractType.getName()));
+        throw new UnregisteredTypeException(String.format("Type {0} was not registered transiently.", abstractType.getName()));
     }
 }
