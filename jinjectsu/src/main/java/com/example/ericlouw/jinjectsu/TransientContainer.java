@@ -33,12 +33,17 @@ class TransientContainer implements ITypeResolver
     }
 
     @Override
-    public boolean isTypeRegistered(Class type) {
-        return this.concreteTypeMap.containsKey(type);
+    public Class getTypeToResolveFor(Class type) {
+        return this.concreteTypeMap.get(type);
     }
 
     @Override
     public Set<Class> getRegisteredTypes() {
         return this.concreteTypeMap.keySet();
+    }
+
+    @Override
+    public boolean isTypeRegistered(Class registeredType) {
+        return this.concreteTypeMap.containsKey(registeredType);
     }
 }

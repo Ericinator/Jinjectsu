@@ -6,7 +6,9 @@ import java.util.Set;
 interface ITypeResolver {
     Object resolve(Class abstractType, Jinjectsu jinjectsu) throws IllegalAccessException, InvocationTargetException, InstantiationException;
 
-    boolean isTypeRegistered(Class type);
+    Class getTypeToResolveFor(Class type);
 
     Set<Class> getRegisteredTypes();
+
+    boolean isTypeRegistered(Class registeredType);
 }

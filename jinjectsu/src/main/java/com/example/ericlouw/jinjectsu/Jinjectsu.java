@@ -24,7 +24,7 @@ public class Jinjectsu {
     private Map<RegistrationType, ITypeResolver> resolverMap;
     private CyclicDependencyChecker cyclicDependencyChecker;
 
-    public Jinjectsu(){
+    public Jinjectsu() {
         this.instanceContainer = new InstanceContainer();
         this.transientContainer = new TransientContainer();
         this.singletonContainer = new SingletonContainer();
@@ -41,8 +41,8 @@ public class Jinjectsu {
     public void inject(Object target) {
         Field[] fields = target.getClass().getDeclaredFields();
 
-        for (Field field : fields){
-            if(!field.isAnnotationPresent(Inject.class)){
+        for (Field field : fields) {
+            if (!field.isAnnotationPresent(Inject.class)) {
                 continue;
             }
 
@@ -57,13 +57,12 @@ public class Jinjectsu {
 
     }
 
-    public ITypeBinder bind(Class abstractType){
+    public ITypeBinder bind(Class abstractType) {
         return new TypeBinder(abstractType, this);
     }
 
-    public <TInterface> TInterface resolve(Class abstractType)  {
-        if (!this.registrationTypeMap.containsKey(abstractType))
-        {
+    public <TInterface> TInterface resolve(Class abstractType) {
+        if (!this.registrationTypeMap.containsKey(abstractType)) {
             throw new UnregisteredTypeException(String.format("Type %s was not registered.", abstractType.getName()));
         }
 
@@ -72,7 +71,7 @@ public class Jinjectsu {
         ITypeResolver resolver = this.resolverMap.get(registrationType);
 
         try {
-            return (TInterface)(resolver.resolve(abstractType, this));
+            return (TInterface) (resolver.resolve(abstractType, this));
         } catch (InstantiationException e) {
             throw new ConstructorResolutionException(String.format("An error occurred while resolving type {%s}.", abstractType.getName()), e);
         } catch (IllegalAccessException e) {
@@ -82,15 +81,15 @@ public class Jinjectsu {
         }
     }
 
-    public void beginScope(){
+    public void beginScope() {
         this.scopedContainer.push();
     }
 
-    public void endScope(){
+    public void endScope() {
         this.scopedContainer.pop();
     }
 
-    public boolean validateTypeRegistration(){
+    public boolean validateTypeRegistration() {
         Set<Class> allRegisteredTypes = new HashSet<>();
 
         allRegisteredTypes.addAll(this.singletonContainer.getRegisteredTypes());
@@ -98,17 +97,46 @@ public class Jinjectsu {
         allRegisteredTypes.addAll(this.instanceContainer.getRegisteredTypes());
         allRegisteredTypes.addAll(this.scopedContainer.getRegisteredTypes());
 
-        for(Class type : allRegisteredTypes){
-            try {
-                this.resolve(type);
-            }
-            catch(Exception e){
-                e.printStackTrace();
-                return false;
+        for (Class type : allRegisteredTypes) {
+            Class concreteType = this.getTypeRegisteredUnder(type);
+
+            Class[] dependecies = this.getConstructorDependenciesForType(concreteType);
+
+            for (Class dependency : dependecies) {
+                try {
+                    if (!allRegisteredTypes.contains(dependency)) {
+                        throw new UnregisteredTypeException(String.format("Type %s was not regstered.", dependency.getName()));
+                    }
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                    return false;
+                }
             }
         }
 
         return true;
+    }
+
+    private Class getTypeRegisteredUnder(Class registeredType) {
+
+        if (this.singletonContainer.isTypeRegistered(registeredType)) {
+            return this.singletonContainer.getTypeToResolveFor(registeredType);
+        }
+
+        if (this.transientContainer.isTypeRegistered(registeredType)) {
+            return this.transientContainer.getTypeToResolveFor(registeredType);
+        }
+
+        if (this.scopedContainer.isTypeRegistered(registeredType)) {
+            return this.scopedContainer.getTypeToResolveFor(registeredType);
+        }
+
+        if (this.instanceContainer.isTypeRegistered(registeredType)) {
+            return this.instanceContainer.getTypeToResolveFor(registeredType);
+        }
+
+        throw new UnregisteredTypeException(String.format("Type %s was not regstered.", registeredType.getName()));
     }
 
     <TConcrete> void registerInstance(Class abstractType, TConcrete instance) {
@@ -139,20 +167,20 @@ public class Jinjectsu {
 
         Class[] parameterTypes = constructor.getParameterTypes();
 
-        if(parameterTypes.length == 0){
-           return constructor.newInstance();
+        if (parameterTypes.length == 0) {
+            return constructor.newInstance();
         }
 
         Object[] parameterValues = new Object[parameterTypes.length];
 
-        for(int i = 0; i < parameterTypes.length; i++){
+        for (int i = 0; i < parameterTypes.length; i++) {
             parameterValues[i] = this.resolve(parameterTypes[i]);
         }
 
         return constructor.newInstance(parameterValues);
     }
 
-    private Class[] getConstructorDependenciesForType(Class type){
+    private Class[] getConstructorDependenciesForType(Class type) {
         Constructor constructor = type.getDeclaredConstructors()[0];
 
         return constructor.getParameterTypes();

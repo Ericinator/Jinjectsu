@@ -25,12 +25,17 @@ class InstanceContainer implements ITypeResolver {
     }
 
     @Override
-    public boolean isTypeRegistered(Class type) {
-        return this.instanceMap.containsKey(type);
+    public Class getTypeToResolveFor(Class type) {
+        return this.instanceMap.get(type).getClass();
     }
 
     @Override
     public Set<Class> getRegisteredTypes() {
         return this.instanceMap.keySet();
+    }
+
+    @Override
+    public boolean isTypeRegistered(Class registeredType) {
+        return this.instanceMap.containsKey(registeredType);
     }
 }

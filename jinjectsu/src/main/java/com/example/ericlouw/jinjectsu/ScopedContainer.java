@@ -46,12 +46,17 @@ public class ScopedContainer implements  ITypeResolver {
     }
 
     @Override
-    public boolean isTypeRegistered(Class type) {
-        return this.typeMap.containsKey(type);
+    public Class getTypeToResolveFor(Class type) {
+        return this.typeMap.get(type);
     }
 
     @Override
     public Set<Class> getRegisteredTypes() {
         return this.typeMap.keySet();
+    }
+
+    @Override
+    public boolean isTypeRegistered(Class registeredType) {
+        return this.typeMap.containsKey(registeredType);
     }
 }

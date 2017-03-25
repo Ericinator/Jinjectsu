@@ -46,12 +46,17 @@ class SingletonContainer implements ITypeResolver {
     }
 
     @Override
-    public boolean isTypeRegistered(Class type) {
-        return this.singletonTypeMap.containsKey(type);
+    public Class getTypeToResolveFor(Class type) {
+        return this.singletonTypeMap.get(type);
     }
 
     @Override
     public Set<Class> getRegisteredTypes() {
         return this.singletonTypeMap.keySet();
+    }
+
+    @Override
+    public boolean isTypeRegistered(Class registeredType) {
+        return this.singletonTypeMap.containsKey(registeredType);
     }
 }
