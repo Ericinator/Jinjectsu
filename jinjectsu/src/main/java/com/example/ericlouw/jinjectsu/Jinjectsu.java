@@ -16,10 +16,10 @@ import exceptions.InjectionException;
 import exceptions.UnregisteredTypeException;
 
 public class Jinjectsu {
-    private InstanceContainer instanceContainer;
-    private TransientContainer transientContainer;
-    private SingletonContainer singletonContainer;
-    private ScopedContainer scopedContainer;
+    InstanceContainer instanceContainer;
+    TransientContainer transientContainer;
+    SingletonContainer singletonContainer;
+    ScopedContainer scopedContainer;
     private Map<Class, RegistrationType> registrationTypeMap;
     private Map<RegistrationType, ITypeResolver> resolverMap;
     private CyclicDependencyChecker cyclicDependencyChecker;
@@ -89,36 +89,8 @@ public class Jinjectsu {
         this.scopedContainer.pop();
     }
 
-    public boolean validateTypeRegistration() {
-        Set<Class> allRegisteredTypes = new HashSet<>();
 
-        allRegisteredTypes.addAll(this.singletonContainer.getRegisteredTypes());
-        allRegisteredTypes.addAll(this.transientContainer.getRegisteredTypes());
-        allRegisteredTypes.addAll(this.instanceContainer.getRegisteredTypes());
-        allRegisteredTypes.addAll(this.scopedContainer.getRegisteredTypes());
-
-        for (Class type : allRegisteredTypes) {
-            Class concreteType = this.getTypeRegisteredUnder(type);
-
-            Class[] dependecies = this.getConstructorDependenciesForType(concreteType);
-
-            for (Class dependency : dependecies) {
-                try {
-                    if (!allRegisteredTypes.contains(dependency)) {
-                        throw new UnregisteredTypeException(String.format("Type %s was not regstered.", dependency.getName()));
-                    }
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private Class getTypeRegisteredUnder(Class registeredType) {
+    Class getTypeRegisteredUnder(Class registeredType) {
 
         if (this.singletonContainer.isTypeRegistered(registeredType)) {
             return this.singletonContainer.getTypeToResolveFor(registeredType);
@@ -180,7 +152,7 @@ public class Jinjectsu {
         return constructor.newInstance(parameterValues);
     }
 
-    private Class[] getConstructorDependenciesForType(Class type) {
+    Class[] getConstructorDependenciesForType(Class type) {
         Constructor constructor = type.getDeclaredConstructors()[0];
 
         return constructor.getParameterTypes();

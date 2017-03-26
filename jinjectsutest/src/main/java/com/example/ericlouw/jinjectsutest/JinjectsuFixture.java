@@ -1,6 +1,7 @@
 package com.example.ericlouw.jinjectsutest;
 
 import com.example.ericlouw.jinjectsu.Jinjectsu;
+import com.example.ericlouw.jinjectsu.JinjectsuAnalyzer;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -269,7 +270,9 @@ public class JinjectsuFixture {
                 .bind(ITestInterfaceA.class).lifestyleTransient(TestConcreteA.class)
                 .bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class);
 
-        boolean validRegistrations = jinjectsu.validateTypeRegistration();
+        JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(jinjectsu);
+
+        boolean validRegistrations = analyzer.validateTypeRegistration();
 
         Assert.assertFalse(validRegistrations);
     }
@@ -283,7 +286,53 @@ public class JinjectsuFixture {
                 .bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class)
                 .bind(ITestInterfaceC.class).lifestyleTransient(TestConcreteC.class);
 
-        boolean validRegistrations = jinjectsu.validateTypeRegistration();
+        JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(jinjectsu);
+
+        boolean validRegistrations = analyzer.validateTypeRegistration();
+
+        Assert.assertTrue(validRegistrations);
+    }
+
+    @Test
+    public void givenJinjectsuWithMissingRegistrations_WhenDryRunning_ReturnsInvalid() {
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu
+                .bind(ITestInterfaceA.class).lifestyleTransient(TestConcreteA.class)
+                .bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class);
+
+        JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(jinjectsu);
+
+        boolean validRegistrations = analyzer.dryRun();
+
+        Assert.assertFalse(validRegistrations);
+    }
+
+    @Test
+    public void givenJinjectsuWithExceptionThrowingDependencies_WhenDryRunning_ReturnsInvalid() {
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu.bind(DependencyWithConstructorException.class).lifestyleTransient(DependencyWithConstructorException.class);
+
+        JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(jinjectsu);
+
+        boolean validRegistrations = analyzer.dryRun();
+
+        Assert.assertFalse(validRegistrations);
+    }
+
+    @Test
+    public void givenJinjectsuWithCompleteRegistrations_WhenDryRunning_ReturnsValid() {
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu
+                .bind(ITestInterfaceA.class).lifestyleTransient(TestConcreteA.class)
+                .bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class)
+                .bind(ITestInterfaceC.class).lifestyleTransient(TestConcreteC.class);
+
+        JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(jinjectsu);
+
+        boolean validRegistrations = analyzer.validateTypeRegistration();
 
         Assert.assertTrue(validRegistrations);
     }
