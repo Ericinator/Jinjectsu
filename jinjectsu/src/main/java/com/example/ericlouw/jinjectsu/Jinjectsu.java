@@ -128,6 +128,13 @@ public class Jinjectsu {
         this.singletonContainer.register(abstractType, concreteType);
     }
 
+    void registerSingleton(Class abstractType, IFactoryMethod factoryMethod) {
+        Class concreteType = factoryMethod.getClass().getMethods()[0].getReturnType();
+        this.cyclicDependencyChecker.registerDependency(abstractType, Arrays.asList(this.getConstructorDependenciesForType(concreteType)));
+        this.registrationTypeMap.put(abstractType, RegistrationType.SINGLETON);
+        this.singletonContainer.register(abstractType, factoryMethod);
+    }
+
     void registerScoped(Class abstractType, Class concreteType) {
         this.cyclicDependencyChecker.registerDependency(abstractType, Arrays.asList(this.getConstructorDependenciesForType(concreteType)));
         this.registrationTypeMap.put(abstractType, RegistrationType.SCOPED);

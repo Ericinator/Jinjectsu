@@ -2,6 +2,20 @@ package com.example.ericlouw.jinjectsutest;
 
 import com.example.ericlouw.jinjectsu.Jinjectsu;
 import com.example.ericlouw.jinjectsu.JinjectsuAnalyzer;
+import com.example.ericlouw.jinjectsutest.testmodels.CyclicDependencyA;
+import com.example.ericlouw.jinjectsutest.testmodels.CyclicDependencyB;
+import com.example.ericlouw.jinjectsutest.testmodels.DependencyWithConstructorException;
+import com.example.ericlouw.jinjectsutest.testmodels.DependencyWithPrivateConstructor;
+import com.example.ericlouw.jinjectsutest.testmodels.ICyclicDependencyA;
+import com.example.ericlouw.jinjectsutest.testmodels.ICyclicDependencyB;
+import com.example.ericlouw.jinjectsutest.testmodels.ITestInterfaceA;
+import com.example.ericlouw.jinjectsutest.testmodels.ITestInterfaceB;
+import com.example.ericlouw.jinjectsutest.testmodels.ITestInterfaceC;
+import com.example.ericlouw.jinjectsutest.testmodels.TestConcreteA;
+import com.example.ericlouw.jinjectsutest.testmodels.TestConcreteB;
+import com.example.ericlouw.jinjectsutest.testmodels.TestConcreteC;
+import com.example.ericlouw.jinjectsutest.testmodels.TestModel;
+import com.example.ericlouw.jinjectsutest.testmodels.TestModelWithNoFields;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -72,21 +86,6 @@ public class JinjectsuFixture {
         Assert.assertNotNull(resolved.getDependencyB());
         Assert.assertNotNull(resolved.getDependencyB().getDependencyC());
         Assert.assertEquals(testC, resolved.getDependencyB().getDependencyC());
-    }
-
-    @Test
-    public void givenJinjectsu_WhenBindingSingleton_ResolvesTSameInstance() throws Exception {
-        Jinjectsu jinjectsu = new Jinjectsu();
-
-        jinjectsu
-                .bind(ITestInterfaceC.class).lifestyleSingleton(TestConcreteC.class);
-
-        ITestInterfaceC resolved1 = jinjectsu.resolve(ITestInterfaceC.class);
-        ITestInterfaceC resolved2 = jinjectsu.resolve(ITestInterfaceC.class);
-
-        Assert.assertNotNull(resolved1);
-        Assert.assertNotNull(resolved2);
-        Assert.assertEquals(resolved1, resolved2);
     }
 
     @Test

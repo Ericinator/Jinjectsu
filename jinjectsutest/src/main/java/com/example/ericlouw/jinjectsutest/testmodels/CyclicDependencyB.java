@@ -1,4 +1,4 @@
-package com.example.ericlouw.jinjectsutest;
+package com.example.ericlouw.jinjectsutest.testmodels;
 
 public class CyclicDependencyB implements ICyclicDependencyB {
     private ICyclicDependencyA cyclicDependencyA;
