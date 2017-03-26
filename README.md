@@ -38,6 +38,11 @@ Each resolve will provide a new instance of the implementation registered under 
 ### Singleton Binding
 Each resolve will provide the same instance of the dependency.
 
+Jinjectsu also supports singleton factory method registration if you wish to execute some code when your singleton is first created:
+```Java
+jinjectsu.bind(ITestA.class).lifestyleSingleton(() -> new TestA());
+```
+
 ### Instance Binding
 The consuming code can new up an appropriate instace of a dependency which  will be provided to all dependent classes.
 
@@ -67,8 +72,25 @@ Jinjectsu provides the *validateTypeRegistration* helper to help you ensure that
 public void givenJinjectsuContainer_WhenValidatingRegistration_ReturnsValid() {
     Jinjectsu yourJinjectsuContainer = yourJinectsuSetupMethod();
 
-    boolean validRegistration = yourJinjectsuContainer.validateTypeRegistration();
+    JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(yourJinjectsuContainer);
+
+    boolean validRegistration = analyzer.validateTypeRegistration();
 
     Assert.assertTrue(validRegistration);
 }
 ```
+
+Additionally the *dryRun* method can be used to initiate a full dependency tree resolution in a unit test. This can be useful to identify erronous constructor logic.
+```Java
+@Test
+public void givenJinjectsuContainer_WhenValidatingRegistration_ReturnsValid() {
+    Jinjectsu yourJinjectsuContainer = yourJinectsuSetupMethod();
+
+    JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(yourJinjectsuContainer);
+
+    boolean validRegistration = analyzer.dryRun();
+
+    Assert.assertTrue(validRegistration);
+}
+```
+*Take care not to use dryRun() in actual production code as singletons will be created and every constructor in your dependency tree will be invoked.*
