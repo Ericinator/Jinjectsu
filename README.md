@@ -38,6 +38,11 @@ Each resolve will provide a new instance of the implementation registered under 
 ### Singleton Binding
 Each resolve will provide the same instance of the dependency.
 
+Jinjectsu also supports singleton factory method registration if you wish to execute some code when your singleton is first created:
+```Java
+jinjectsu.bind(ITestA.class).lifestyleSingleton(() -> new TestA());
+```
+
 ### Instance Binding
 The consuming code can new up an appropriate instace of a dependency which  will be provided to all dependent classes.
 
