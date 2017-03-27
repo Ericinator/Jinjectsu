@@ -345,6 +345,21 @@ public class JinjectsuFixture {
     }
 
     @Test
+    public void givenJinjectsuWithScopeContextRegistration_WhenValidatingRegistration_ReturnsValid() {
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu
+                .bind(ITestInterfaceB.class).lifestyleSingleton(TestConcreteB.class)
+                .bind(ITestInterfaceC.class).providedByScope();
+
+        JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(jinjectsu);
+
+        boolean validRegistrations = analyzer.validateTypeRegistration();
+
+        Assert.assertTrue(validRegistrations);
+    }
+
+    @Test
     public void givenJinjectsuWithMissingRegistrations_WhenDryRunning_ReturnsInvalid() {
         Jinjectsu jinjectsu = new Jinjectsu();
 

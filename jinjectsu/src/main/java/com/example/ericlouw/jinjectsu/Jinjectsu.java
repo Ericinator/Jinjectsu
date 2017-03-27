@@ -20,7 +20,7 @@ public class Jinjectsu {
     SingletonContainer singletonContainer;
     ScopedContainer scopedContainer;
     ScopeContextResolver scopeContextResolver;
-    private Map<Class, RegistrationType> registrationTypeMap;
+    Map<Class, RegistrationType> registrationTypeMap;
     private Map<RegistrationType, ITypeResolver> resolverMap;
     private CyclicDependencyChecker cyclicDependencyChecker;
 

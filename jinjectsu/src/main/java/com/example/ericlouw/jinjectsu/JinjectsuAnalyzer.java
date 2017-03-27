@@ -26,6 +26,11 @@ public class JinjectsuAnalyzer {
             Class[] dependencies = this.jinjectsu.getConstructorDependenciesForType(concreteType);
 
             for (Class dependency : dependencies) {
+
+                if(this.jinjectsu.registrationTypeMap.containsKey(dependency)){
+                    continue;
+                }
+
                 try {
                     if (!allRegisteredTypes.contains(dependency)) {
                         throw new UnregisteredTypeException(String.format("Type %s was not registered.", dependency.getName()));
