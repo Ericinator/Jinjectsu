@@ -19,7 +19,7 @@ ext {
     siteUrl = 'https://github.com/Ericinator/Jinjectsu'
     gitUrl = 'https://github.com/Ericinator/Jinjectsu.git'
 
-    libraryVersion = '0.1.4'
+    libraryVersion = '0.1.5'
 
     developerId = 'ericlouw'
     developerName = 'Eric Louw'
