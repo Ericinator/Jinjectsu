@@ -94,3 +94,25 @@ public void givenJinjectsuContainer_WhenValidatingRegistration_ReturnsValid() {
 }
 ```
 *Take care not to use dryRun() in actual production code as singletons will be created and every constructor in your dependency tree will be invoked.*
+
+## Upcoming
+The next feature to be completed is the concept of scope contexts. Althoud this has been partially (and generically) implemented, the main idea is to support Android context injection. Consider the following:
+
+```Java
+@Inject
+private MyDependency dependency;
+
+protected void onCreate(Bundle savedInstanceState){
+    super.onCreate(savedInstanceState);
+    jinjectsu.beginScope(this);
+    jinjectsu.inject(this);
+}
+```
+
+Given the activity context is now bound to the scope, any dependency on an Android *Context* can now be constructor injected. Your presenter (or other dependency) could for example be defined as:
+
+```Java
+public MyDependency(IService someService, Context context){
+    ...
+}
+```
