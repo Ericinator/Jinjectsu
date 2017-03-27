@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements IExampleView{
 
         this.textView = (TextView) this.findViewById(R.id.text_box);
 
-        InjectionContainer.getInstalledInstance().beginScope();
+        InjectionContainer.getInstalledInstance().beginScope(this);
         InjectionContainer.getInstalledInstance().inject(this);
 
         this.presenter.takeView(this);

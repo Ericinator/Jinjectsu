@@ -5,9 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -21,6 +19,7 @@ public class Jinjectsu {
     TransientContainer transientContainer;
     SingletonContainer singletonContainer;
     ScopedContainer scopedContainer;
+    ScopeContextResolver scopeContextResolver;
     private Map<Class, RegistrationType> registrationTypeMap;
     private Map<RegistrationType, ITypeResolver> resolverMap;
     private CyclicDependencyChecker cyclicDependencyChecker;
@@ -30,13 +29,14 @@ public class Jinjectsu {
         this.transientContainer = new TransientContainer();
         this.singletonContainer = new SingletonContainer();
         this.scopedContainer = new ScopedContainer();
+        this.scopeContextResolver = new ScopeContextResolver(this.scopedContainer);
         this.registrationTypeMap = new HashMap<>();
         this.resolverMap = new HashMap<>();
         this.resolverMap.put(RegistrationType.INSTANCE, this.instanceContainer);
         this.resolverMap.put(RegistrationType.TRANSIENT, this.transientContainer);
         this.resolverMap.put(RegistrationType.SINGLETON, this.singletonContainer);
         this.resolverMap.put(RegistrationType.SCOPED, this.scopedContainer);
-        this.resolverMap.put(RegistrationType.SCOPE_CONTEXT, this.scopedContainer);
+        this.resolverMap.put(RegistrationType.SCOPE_CONTEXT, this.scopeContextResolver);
         this.cyclicDependencyChecker = new CyclicDependencyChecker();
     }
 
@@ -101,12 +101,6 @@ public class Jinjectsu {
     }
 
     public void beginScope(Object context){
-        Class contextType = context.getClass();
-
-        if(!this.registrationTypeMap.containsKey(contextType)){
-            throw new UnregisteredTypeException(String.format("Type %s was not registered to be used as a scope context.", contextType.getName()));
-        }
-
         ScopedSingletonContainer container = new ScopedSingletonContainer();
 
         container.setContext(context);
@@ -165,8 +159,7 @@ public class Jinjectsu {
         this.scopedContainer.register(abstractType, concreteType);
     }
 
-
-    public void registerScopeContext(Class abstractType) {
+    void registerScopeContext(Class abstractType) {
         this.registrationTypeMap.put(abstractType, RegistrationType.SCOPE_CONTEXT);
     }
 

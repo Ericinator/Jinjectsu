@@ -22,7 +22,7 @@ class TypeBinder implements ITypeBinder{
     }
 
     @Override
-    public Jinjectsu scopeContext() {
+    public Jinjectsu providedByScope() {
         this.jinjectsu.registerScopeContext(this.abstractType);
         return this.jinjectsu;
     }

@@ -9,11 +9,5 @@ class ScopedSingletonContainer extends SingletonContainer {
 
     void setContext(Object context){
         this.context = context;
-
-        Class contextType = context.getClass();
-
-        this.singletonTypeMap.put(contextType, contextType);
-
-        this.singletonLookup.put(contextType, context);
     }
 }

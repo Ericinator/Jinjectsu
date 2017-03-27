@@ -159,12 +159,12 @@ public class JinjectsuFixture {
     public void givenScopeWithContext_WhenResolvingScopeContext_ResolvesCorrectly(){
         Jinjectsu jinjectsu = new Jinjectsu();
 
-        jinjectsu.bind(TestConcreteC.class).scopeContext();
+        jinjectsu.bind(ITestInterfaceA.class).providedByScope();
 
         TestConcreteC dependencyA = new TestConcreteC();
 
         jinjectsu.beginScope(dependencyA);
-            TestConcreteC resolved = jinjectsu.resolve(TestConcreteC.class);
+            TestConcreteC resolved = jinjectsu.resolve(ITestInterfaceA.class);
             Assert.assertEquals(dependencyA, resolved);
         jinjectsu.endScope();
     }
@@ -173,7 +173,7 @@ public class JinjectsuFixture {
     public void givenScopedWithContext_WhenResolvingOutsideScope_ThrowsTypeNotRegisteredException(){
         Jinjectsu jinjectsu = new Jinjectsu();
 
-        jinjectsu.bind(TestConcreteC.class).scopeContext();
+        jinjectsu.bind(TestConcreteC.class).providedByScope();
 
         TestConcreteC dependencyA = new TestConcreteC();
 

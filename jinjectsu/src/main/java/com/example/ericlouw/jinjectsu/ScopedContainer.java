@@ -2,6 +2,7 @@ package com.example.ericlouw.jinjectsu;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -30,7 +31,7 @@ public class ScopedContainer implements  ITypeResolver {
         return this.scopeContainerStack.pop();
     }
 
-    private SingletonContainer getCurrentScope(){
+    ScopedSingletonContainer getCurrentScope(){
         return this.scopeContainerStack.peek();
     }
 
