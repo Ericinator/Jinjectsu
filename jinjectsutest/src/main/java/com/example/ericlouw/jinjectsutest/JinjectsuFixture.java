@@ -22,7 +22,8 @@ import org.junit.Test;
 
 import exceptions.ConstructorResolutionException;
 import exceptions.CyclicDependencyException;
-
+import exceptions.TypeAlreadyRegisteredException;
+import exceptions.UnregisteredTypeException;
 
 public class JinjectsuFixture {
 
@@ -35,6 +36,22 @@ public class JinjectsuFixture {
         } catch (Exception e) {
             Assert.assertTrue(true);
             e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void givenJinjectsuWithBoundType_WhenBindingSameTypeAgain_ThrowsTypeAlreadyRegisteredException(){
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu.bind(TestConcreteC.class).lifestyleTransient(TestConcreteC.class);
+
+        try{
+            jinjectsu.bind(TestConcreteC.class).lifestyleSingleton(TestConcreteC.class);
+            Assert.assertTrue(false);
+        }
+        catch(TypeAlreadyRegisteredException e){
+            Assert.assertTrue(true);
+            Assert.assertTrue(e.getMessage().contains("TRANSIENT"));
         }
     }
 
@@ -136,6 +153,40 @@ public class JinjectsuFixture {
         Assert.assertEquals(resolved1, resolved2);
         Assert.assertNotEquals(resolved3, resolved1);
         Assert.assertNotEquals(resolved3, resolved2);
+    }
+
+    @Test
+    public void givenScopeWithContext_WhenResolvingScopeContext_ResolvesCorrectly(){
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu.bind(TestConcreteC.class).scopeContext();
+
+        TestConcreteC dependencyA = new TestConcreteC();
+
+        jinjectsu.beginScope(dependencyA);
+            TestConcreteC resolved = jinjectsu.resolve(TestConcreteC.class);
+            Assert.assertEquals(dependencyA, resolved);
+        jinjectsu.endScope();
+    }
+
+    @Test
+    public void givenScopedWithContext_WhenResolvingOutsideScope_ThrowsTypeNotRegisteredException(){
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu.bind(TestConcreteC.class).scopeContext();
+
+        TestConcreteC dependencyA = new TestConcreteC();
+
+        jinjectsu.beginScope(dependencyA);
+        jinjectsu.endScope();
+
+        try {
+            jinjectsu.resolve(TestConcreteC.class);
+            Assert.assertTrue(false);
+        }
+        catch (UnregisteredTypeException e){
+            Assert.assertTrue(true);
+        }
     }
 
     @Test

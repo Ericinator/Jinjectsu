@@ -13,6 +13,7 @@ import javax.inject.Inject;
 
 import exceptions.ConstructorResolutionException;
 import exceptions.InjectionException;
+import exceptions.TypeAlreadyRegisteredException;
 import exceptions.UnregisteredTypeException;
 
 public class Jinjectsu {
@@ -35,6 +36,7 @@ public class Jinjectsu {
         this.resolverMap.put(RegistrationType.TRANSIENT, this.transientContainer);
         this.resolverMap.put(RegistrationType.SINGLETON, this.singletonContainer);
         this.resolverMap.put(RegistrationType.SCOPED, this.scopedContainer);
+        this.resolverMap.put(RegistrationType.SCOPE_CONTEXT, this.scopedContainer);
         this.cyclicDependencyChecker = new CyclicDependencyChecker();
     }
 
@@ -58,6 +60,9 @@ public class Jinjectsu {
     }
 
     public ITypeBinder bind(Class abstractType) {
+        if(this.registrationTypeMap.containsKey(abstractType)){
+            throw new TypeAlreadyRegisteredException(String.format("Type %s has already been registered under lifestyle %s." ,abstractType.getName(), this.registrationTypeMap.get(abstractType).toString()));
+        }
         return new TypeBinder(abstractType, this);
     }
 
@@ -82,13 +87,32 @@ public class Jinjectsu {
     }
 
     public void beginScope() {
-        this.scopedContainer.push();
+        this.scopedContainer.push(new ScopedSingletonContainer());
     }
 
     public void endScope() {
-        this.scopedContainer.pop();
+        ScopedSingletonContainer container = this.scopedContainer.pop();
+
+        Object context = container.getContext();
+
+        if(context != null){
+            this.registrationTypeMap.remove(context.getClass());
+        }
     }
 
+    public void beginScope(Object context){
+        Class contextType = context.getClass();
+
+        if(!this.registrationTypeMap.containsKey(contextType)){
+            throw new UnregisteredTypeException(String.format("Type %s was not registered to be used as a scope context.", contextType.getName()));
+        }
+
+        ScopedSingletonContainer container = new ScopedSingletonContainer();
+
+        container.setContext(context);
+
+        this.scopedContainer.push(container);
+    }
 
     Class getTypeRegisteredUnder(Class registeredType) {
 
@@ -139,6 +163,11 @@ public class Jinjectsu {
         this.cyclicDependencyChecker.registerDependency(abstractType, Arrays.asList(this.getConstructorDependenciesForType(concreteType)));
         this.registrationTypeMap.put(abstractType, RegistrationType.SCOPED);
         this.scopedContainer.register(abstractType, concreteType);
+    }
+
+
+    public void registerScopeContext(Class abstractType) {
+        this.registrationTypeMap.put(abstractType, RegistrationType.SCOPE_CONTEXT);
     }
 
     Object ConstructorResolve(Class type) throws IllegalAccessException, InvocationTargetException, InstantiationException {

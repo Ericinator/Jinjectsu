@@ -10,15 +10,14 @@ public class ScopedContainer implements  ITypeResolver {
 
     private Map<Class, Class> typeMap;
 
-    private Stack<SingletonContainer> scopeContainerStack;
+    private Stack<ScopedSingletonContainer> scopeContainerStack;
 
     ScopedContainer(){
         this.scopeContainerStack = new Stack<>();
         this.typeMap = new HashMap<>();
     }
 
-    void push(){
-        SingletonContainer singletonContainer = new SingletonContainer();
+    void push(ScopedSingletonContainer singletonContainer){
 
         for(Map.Entry<Class, Class> entry : this.typeMap.entrySet()){
             singletonContainer.register(entry.getKey(), entry.getValue());
@@ -27,7 +26,7 @@ public class ScopedContainer implements  ITypeResolver {
         this.scopeContainerStack.push(singletonContainer);
     }
 
-    SingletonContainer pop(){
+    ScopedSingletonContainer pop(){
         return this.scopeContainerStack.pop();
     }
 

@@ -22,6 +22,12 @@ class TypeBinder implements ITypeBinder{
     }
 
     @Override
+    public Jinjectsu scopeContext() {
+        this.jinjectsu.registerScopeContext(this.abstractType);
+        return this.jinjectsu;
+    }
+
+    @Override
     public <TConcrete> Jinjectsu lifestyleSingleton(IFactoryMethod<TConcrete> factoryMethod) {
         this.jinjectsu.registerSingleton(this.abstractType, factoryMethod);
         return this.jinjectsu;

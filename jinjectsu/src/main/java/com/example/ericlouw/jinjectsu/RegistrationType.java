@@ -4,5 +4,6 @@ enum RegistrationType {
     INSTANCE,
     TRANSIENT,
     SINGLETON,
-    SCOPED
+    SCOPED,
+    SCOPE_CONTEXT
 }

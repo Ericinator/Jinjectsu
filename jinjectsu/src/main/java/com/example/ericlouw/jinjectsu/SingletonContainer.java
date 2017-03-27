@@ -9,9 +9,9 @@ import exceptions.TypeAlreadyRegisteredException;
 import exceptions.UnregisteredTypeException;
 
 class SingletonContainer implements ITypeResolver {
-    private Map<Class, Object> singletonLookup;
+    protected Map<Class, Object> singletonLookup;
 
-    private Map<Class, Class> singletonTypeMap;
+    protected Map<Class, Class> singletonTypeMap;
 
     private Map<Class, IFactoryMethod> singletonFactoryMethodMap;
 
