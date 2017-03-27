@@ -320,6 +320,7 @@ public class JinjectsuFixture {
                 .bind(ITestInterfaceA.class).lifestyleTransient(TestConcreteA.class)
                 .bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class);
 
+
         JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(jinjectsu);
 
         boolean validRegistrations = analyzer.validateTypeRegistration();
@@ -334,7 +335,7 @@ public class JinjectsuFixture {
         jinjectsu
                 .bind(ITestInterfaceA.class).lifestyleTransient(TestConcreteA.class)
                 .bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class)
-                .bind(ITestInterfaceC.class).lifestyleTransient(TestConcreteC.class);
+                .bind(ITestInterfaceC.class).lifestyleSingleton(() -> new TestConcreteC());
 
         JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(jinjectsu);
 

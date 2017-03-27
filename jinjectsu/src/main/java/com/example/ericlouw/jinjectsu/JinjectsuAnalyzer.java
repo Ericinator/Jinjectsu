@@ -23,12 +23,12 @@ public class JinjectsuAnalyzer {
         for (Class type : allRegisteredTypes) {
             Class concreteType = this.jinjectsu.getTypeRegisteredUnder(type);
 
-            Class[] dependecies = this.jinjectsu.getConstructorDependenciesForType(concreteType);
+            Class[] dependencies = this.jinjectsu.getConstructorDependenciesForType(concreteType);
 
-            for (Class dependency : dependecies) {
+            for (Class dependency : dependencies) {
                 try {
                     if (!allRegisteredTypes.contains(dependency)) {
-                        throw new UnregisteredTypeException(String.format("Type %s was not regstered.", dependency.getName()));
+                        throw new UnregisteredTypeException(String.format("Type %s was not registered.", dependency.getName()));
                     }
                 }
                 catch (Exception e){

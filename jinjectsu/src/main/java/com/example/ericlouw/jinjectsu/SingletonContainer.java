@@ -2,6 +2,7 @@ package com.example.ericlouw.jinjectsu;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,9 +10,9 @@ import exceptions.TypeAlreadyRegisteredException;
 import exceptions.UnregisteredTypeException;
 
 class SingletonContainer implements ITypeResolver {
-    protected Map<Class, Object> singletonLookup;
+    private Map<Class, Object> singletonLookup;
 
-    protected Map<Class, Class> singletonTypeMap;
+    private Map<Class, Class> singletonTypeMap;
 
     private Map<Class, IFactoryMethod> singletonFactoryMethodMap;
 
@@ -23,18 +24,16 @@ class SingletonContainer implements ITypeResolver {
         this.singletonFactoryMethodMap = new HashMap<>();
     }
 
-    void register(Class abstractType, Class concreteType)
-    {
-        if(this.singletonFactoryMethodMap.containsKey(abstractType)){
+    void register(Class abstractType, Class concreteType) {
+        if (this.singletonFactoryMethodMap.containsKey(abstractType)) {
             throw new TypeAlreadyRegisteredException(String.format("Type %s has already been registered as a singleton to be resolved using a factory method.", abstractType.getName()));
         }
 
         this.singletonTypeMap.put(abstractType, concreteType);
     }
 
-    void register(Class abstractType, IFactoryMethod factoryMethod)
-    {
-        if(this.singletonTypeMap.containsKey(abstractType)){
+    void register(Class abstractType, IFactoryMethod factoryMethod) {
+        if (this.singletonTypeMap.containsKey(abstractType)) {
             throw new TypeAlreadyRegisteredException(String.format("Type %s has already been registered as a singleton.", abstractType.getName()));
         }
 
@@ -48,7 +47,7 @@ class SingletonContainer implements ITypeResolver {
             return jinjectsu.ConstructorResolve(concreteClass);
         }
 
-        if(this.singletonFactoryMethodMap.containsKey(abstractClass)){
+        if (this.singletonFactoryMethodMap.containsKey(abstractClass)) {
             return this.singletonFactoryMethodMap.get(abstractClass).create();
         }
 
@@ -59,8 +58,7 @@ class SingletonContainer implements ITypeResolver {
     public Object resolve(Class abstractType, Jinjectsu jinjectsu) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         boolean singletonExists = this.singletonLookup.containsKey(abstractType);
 
-        if (!singletonExists)
-        {
+        if (!singletonExists) {
             this.singletonLookup.put(abstractType, this.CreateSingleton(abstractType, jinjectsu));
         }
 
@@ -69,16 +67,25 @@ class SingletonContainer implements ITypeResolver {
 
     @Override
     public Class getTypeToResolveFor(Class type) {
-        return this.singletonTypeMap.get(type);
+        if (this.singletonTypeMap.containsKey(type)) {
+            return this.singletonTypeMap.get(type);
+        }
+
+        IFactoryMethod factoryMethod = this.singletonFactoryMethodMap.get(type);
+
+        return factoryMethod.getClass().getMethods()[0].getReturnType();
     }
 
     @Override
     public Set<Class> getRegisteredTypes() {
-        return this.singletonTypeMap.keySet();
+        Set<Class> types = new HashSet<>();
+        types.addAll(this.singletonTypeMap.keySet());
+        types.addAll(this.singletonFactoryMethodMap.keySet());
+        return types;
     }
 
     @Override
     public boolean isTypeRegistered(Class registeredType) {
-        return this.singletonTypeMap.containsKey(registeredType);
+        return this.singletonTypeMap.containsKey(registeredType) || this.singletonFactoryMethodMap.containsKey(registeredType);
     }
 }
