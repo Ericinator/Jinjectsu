@@ -10,7 +10,7 @@ ext {
     bintrayRepo = 'Jinjectsu'
     bintrayName = 'Jinjectsu'
 
-    publishedGroupId = 'com.example.ericlouw'
+    publishedGroupId = 'com.ericlouw.jinjectsu'
     libraryName = 'Jinjectsu'
     artifact = 'jinjectsu'
 
@@ -19,7 +19,7 @@ ext {
     siteUrl = 'https://github.com/Ericinator/Jinjectsu'
     gitUrl = 'https://github.com/Ericinator/Jinjectsu.git'
 
-    libraryVersion = '0.1.8'
+    libraryVersion = '0.2.0'
 
     developerId = 'ericlouw'
     developerName = 'Eric Louw'
