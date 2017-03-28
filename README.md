@@ -96,7 +96,7 @@ public void givenJinjectsuContainer_WhenValidatingRegistration_ReturnsValid() {
 *Take care not to use dryRun() in actual production code as singletons will be created and every constructor in your dependency tree will be invoked.*
 
 ## Upcoming
-The next feature to be completed is the concept of scope contexts. Althoud this has been partially (and generically) implemented, the main idea is to support Android context injection. Consider the following:
+The next feature to be completed is the concept of scope contexts. Although this has been partially (and generically) implemented, the main idea is to support Android context injection. Consider the following:
 
 ```Java
 @Inject
