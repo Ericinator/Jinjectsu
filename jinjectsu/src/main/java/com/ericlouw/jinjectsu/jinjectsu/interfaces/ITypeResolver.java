@@ -1,9 +1,10 @@
-package com.ericlouw.jinjectsu.jinjectsu;
+package com.ericlouw.jinjectsu.jinjectsu.interfaces;
 
+import com.ericlouw.jinjectsu.jinjectsu.Jinjectsu;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
-interface ITypeResolver {
+public interface ITypeResolver {
     Object resolve(Class abstractType, Jinjectsu jinjectsu) throws IllegalAccessException, InvocationTargetException, InstantiationException;
 
     Class getTypeToResolveFor(Class type);

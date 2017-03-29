@@ -1,5 +1,6 @@
 package com.ericlouw.jinjectsu.jinjectsu;
 
+import com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeResolver;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

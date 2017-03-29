@@ -1,6 +1,10 @@
 package com.ericlouw.jinjectsu.jinjectsu;
 
-class TypeBinder implements ITypeBinder{
+import com.ericlouw.jinjectsu.jinjectsu.interfaces.IFactoryMethod;
+import com.ericlouw.jinjectsu.jinjectsu.interfaces.IScopeContextBinder;
+import com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeBinder;
+
+class TypeBinder implements ITypeBinder {
     private Jinjectsu jinjectsu;
     private Class abstractType;
 
@@ -22,9 +26,8 @@ class TypeBinder implements ITypeBinder{
     }
 
     @Override
-    public Jinjectsu providedByScope() {
-        this.jinjectsu.registerScopeContext(this.abstractType);
-        return this.jinjectsu;
+    public IScopeContextBinder providedByScope() {
+        return new ScopeContextBinder(this.jinjectsu, this.abstractType);
     }
 
     @Override

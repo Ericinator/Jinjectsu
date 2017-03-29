@@ -8,13 +8,14 @@ import java.util.Set;
 
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.TypeAlreadyRegisteredException;
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.UnregisteredTypeException;
+import com.ericlouw.jinjectsu.jinjectsu.interfaces.IFactoryMethod;
 
-class SingletonContainer implements ITypeResolver {
+class SingletonContainer implements com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeResolver {
     private Map<Class, Object> singletonLookup;
 
     private Map<Class, Class> singletonTypeMap;
 
-    private Map<Class, IFactoryMethod> singletonFactoryMethodMap;
+    private Map<Class, com.ericlouw.jinjectsu.jinjectsu.interfaces.IFactoryMethod> singletonFactoryMethodMap;
 
     SingletonContainer() {
         this.singletonLookup = new HashMap<>();
@@ -32,7 +33,7 @@ class SingletonContainer implements ITypeResolver {
         this.singletonTypeMap.put(abstractType, concreteType);
     }
 
-    void register(Class abstractType, IFactoryMethod factoryMethod) {
+    void register(Class abstractType, com.ericlouw.jinjectsu.jinjectsu.interfaces.IFactoryMethod factoryMethod) {
         if (this.singletonTypeMap.containsKey(abstractType)) {
             throw new TypeAlreadyRegisteredException(String.format("Type %s has already been registered as a singleton.", abstractType.getName()));
         }

@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-public class ScopedContainer implements  ITypeResolver {
+public class ScopedContainer implements com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeResolver {
 
     private Map<Class, Class> typeMap;
 

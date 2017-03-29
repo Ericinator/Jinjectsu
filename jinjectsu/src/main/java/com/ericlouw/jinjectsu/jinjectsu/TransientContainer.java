@@ -8,7 +8,7 @@ import java.util.Set;
 
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.UnregisteredTypeException;
 
-class TransientContainer implements ITypeResolver
+class TransientContainer implements com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeResolver
 {
     private Map<Class, Class> concreteTypeMap;
 

@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -13,15 +14,16 @@ import com.ericlouw.jinjectsu.jinjectsu.exceptions.ConstructorResolutionExceptio
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.InjectionException;
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.TypeAlreadyRegisteredException;
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.UnregisteredTypeException;
+import com.ericlouw.jinjectsu.jinjectsu.interfaces.IFactoryMethod;
 
 public class Jinjectsu {
     InstanceContainer instanceContainer;
     TransientContainer transientContainer;
     SingletonContainer singletonContainer;
     ScopedContainer scopedContainer;
-    ScopeContextResolver scopeContextResolver;
+    ScopeContextContainer scopeContextContainer;
     Map<Class, RegistrationType> registrationTypeMap;
-    private Map<RegistrationType, ITypeResolver> resolverMap;
+    private Map<RegistrationType, com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeResolver> resolverMap;
     private CyclicDependencyChecker cyclicDependencyChecker;
 
     public Jinjectsu() {
@@ -29,14 +31,14 @@ public class Jinjectsu {
         this.transientContainer = new TransientContainer();
         this.singletonContainer = new SingletonContainer();
         this.scopedContainer = new ScopedContainer();
-        this.scopeContextResolver = new ScopeContextResolver(this.scopedContainer);
+        this.scopeContextContainer = new ScopeContextContainer(this.scopedContainer);
         this.registrationTypeMap = new HashMap<>();
         this.resolverMap = new HashMap<>();
         this.resolverMap.put(RegistrationType.INSTANCE, this.instanceContainer);
         this.resolverMap.put(RegistrationType.TRANSIENT, this.transientContainer);
         this.resolverMap.put(RegistrationType.SINGLETON, this.singletonContainer);
         this.resolverMap.put(RegistrationType.SCOPED, this.scopedContainer);
-        this.resolverMap.put(RegistrationType.SCOPE_CONTEXT, this.scopeContextResolver);
+        this.resolverMap.put(RegistrationType.SCOPE_CONTEXT, this.scopeContextContainer);
         this.cyclicDependencyChecker = new CyclicDependencyChecker();
     }
 
@@ -59,7 +61,7 @@ public class Jinjectsu {
 
     }
 
-    public ITypeBinder bind(Class abstractType) {
+    public com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeBinder bind(Class abstractType) {
         if(this.registrationTypeMap.containsKey(abstractType)){
             throw new TypeAlreadyRegisteredException(String.format("Type %s has already been registered under lifestyle %s." ,abstractType.getName(), this.registrationTypeMap.get(abstractType).toString()));
         }
@@ -73,7 +75,7 @@ public class Jinjectsu {
 
         RegistrationType registrationType = this.registrationTypeMap.get(abstractType);
 
-        ITypeResolver resolver = this.resolverMap.get(registrationType);
+        com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeResolver resolver = this.resolverMap.get(registrationType);
 
         try {
             return (TInterface) (resolver.resolve(abstractType, this));
@@ -159,8 +161,9 @@ public class Jinjectsu {
         this.scopedContainer.register(abstractType, concreteType);
     }
 
-    void registerScopeContext(Class abstractType) {
+    void registerScopeContext(Class abstractType, Class... concreteContexts) {
         this.registrationTypeMap.put(abstractType, RegistrationType.SCOPE_CONTEXT);
+        this.scopeContextContainer.register(abstractType, concreteContexts);
     }
 
     Object ConstructorResolve(Class type) throws IllegalAccessException, InvocationTargetException, InstantiationException {

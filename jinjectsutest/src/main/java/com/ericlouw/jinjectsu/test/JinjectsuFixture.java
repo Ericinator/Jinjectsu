@@ -2,6 +2,8 @@ package com.ericlouw.jinjectsu.test;
 
 import com.ericlouw.jinjectsu.jinjectsu.Jinjectsu;
 import com.ericlouw.jinjectsu.jinjectsu.JinjectsuAnalyzer;
+import com.ericlouw.jinjectsu.jinjectsu.exceptions.InvalidScopeContextException;
+import com.ericlouw.jinjectsu.jinjectsu.exceptions.InvalidScopeException;
 import com.ericlouw.jinjectsu.test.testmodels.CyclicDependencyA;
 import com.ericlouw.jinjectsu.test.testmodels.CyclicDependencyB;
 import com.ericlouw.jinjectsu.test.testmodels.DependencyWithConstructorException;
@@ -14,6 +16,7 @@ import com.ericlouw.jinjectsu.test.testmodels.ITestInterfaceC;
 import com.ericlouw.jinjectsu.test.testmodels.TestConcreteA;
 import com.ericlouw.jinjectsu.test.testmodels.TestConcreteB;
 import com.ericlouw.jinjectsu.test.testmodels.TestConcreteC;
+import com.ericlouw.jinjectsu.test.testmodels.TestConcreteC2;
 import com.ericlouw.jinjectsu.test.testmodels.TestModel;
 import com.ericlouw.jinjectsu.test.testmodels.TestModelWithNoFields;
 
@@ -153,20 +156,6 @@ public class JinjectsuFixture {
         Assert.assertEquals(resolved1, resolved2);
         Assert.assertNotEquals(resolved3, resolved1);
         Assert.assertNotEquals(resolved3, resolved2);
-    }
-
-    @Test
-    public void givenScopeWithContext_WhenResolvingScopeContext_ResolvesCorrectly(){
-        Jinjectsu jinjectsu = new Jinjectsu();
-
-        jinjectsu.bind(ITestInterfaceA.class).providedByScope();
-
-        TestConcreteC dependencyA = new TestConcreteC();
-
-        jinjectsu.beginScope(dependencyA);
-            TestConcreteC resolved = jinjectsu.resolve(ITestInterfaceA.class);
-            Assert.assertEquals(dependencyA, resolved);
-        jinjectsu.endScope();
     }
 
     @Test
@@ -349,8 +338,9 @@ public class JinjectsuFixture {
         Jinjectsu jinjectsu = new Jinjectsu();
 
         jinjectsu
+                .bind(ITestInterfaceA.class).lifestyleTransient(TestConcreteA.class)
                 .bind(ITestInterfaceB.class).lifestyleSingleton(TestConcreteB.class)
-                .bind(ITestInterfaceC.class).providedByScope();
+                .bind(ITestInterfaceC.class).providedByScope().satisfiedBy(TestConcreteC.class);
 
         JinjectsuAnalyzer analyzer = new JinjectsuAnalyzer(jinjectsu);
 
@@ -401,5 +391,75 @@ public class JinjectsuFixture {
         boolean validRegistrations = analyzer.validateTypeRegistration();
 
         Assert.assertTrue(validRegistrations);
+    }
+
+    @Test
+    public void givenJinjectsuWithScopeContextDependencies_WhenResolveInsideScopeWithoutContext_ThrowsException(){
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu.bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class)
+                .bind(ITestInterfaceC.class).providedByScope().satisfiedBy(TestConcreteC.class);
+
+        try{
+            jinjectsu.beginScope();
+            jinjectsu.resolve(ITestInterfaceC.class);
+            jinjectsu.endScope();
+        }
+        catch(InvalidScopeException e){
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void givenJinjectsuWithScopeContextDependencies_WhenResolveInsideWrongContext_ThrowsException(){
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu.bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class)
+                .bind(ITestInterfaceC.class).providedByScope().satisfiedBy(TestConcreteC.class);
+
+        try{
+            jinjectsu.beginScope(new Object());
+                jinjectsu.resolve(ITestInterfaceC.class);
+            jinjectsu.endScope();
+        }
+        catch(InvalidScopeContextException e){
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void givenJinjectsuWithScopeContextDependenciesSatisfiedByOne_WhenResolveInsideContext_ResolvesCorrectly(){
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu.bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class)
+                .bind(ITestInterfaceC.class).providedByScope().satisfiedBy(TestConcreteC.class);
+
+        jinjectsu.beginScope(new TestConcreteC());
+            ITestInterfaceC resolved = jinjectsu.resolve(ITestInterfaceC.class);
+        jinjectsu.endScope();
+
+        Assert.assertNotNull(resolved);
+    }
+
+    @Test
+    public void givenJinjectsuWithScopeContextDependenciesSatisfiedByMany_WhenResolveInsideContext_ResolvesCorrectly(){
+        Jinjectsu jinjectsu = new Jinjectsu();
+
+        jinjectsu.bind(ITestInterfaceB.class).lifestyleTransient(TestConcreteB.class)
+                .bind(ITestInterfaceC.class).providedByScope().satisfiedBy(TestConcreteC2.class, TestConcreteC.class);
+
+        jinjectsu.beginScope(new TestConcreteC());
+        ITestInterfaceC resolved = jinjectsu.resolve(ITestInterfaceC.class);
+        jinjectsu.endScope();
+
+        jinjectsu.beginScope(new TestConcreteC2());
+        ITestInterfaceC resolved2 = jinjectsu.resolve(ITestInterfaceC.class);
+        jinjectsu.endScope();
+
+        Assert.assertNotNull(resolved);
+        Assert.assertNotNull(resolved2);
+
+        Assert.assertEquals(resolved.getClass(), TestConcreteC.class);
+        Assert.assertEquals(resolved2.getClass(), TestConcreteC2.class);
     }
 }
