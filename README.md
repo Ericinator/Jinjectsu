@@ -64,6 +64,29 @@ container.endScope();
 ```
 *Please note that the code snippet above is a terrible example of how to use this container. Calling the resolve method manually most likely indicates incorrect usage.*
 
+### Scope context binding
+
+Jinjectsu allows you to bind a dependency to a scope context. Although not a typical IoC container feature, it can be useful for cases where your dependency may be satisfied by different classes depending on the current app state. This was designed for use in Android but can be used anywhere.
+
+Example registration:
+
+```Java
+jinjectsu.bind(Context.class).providedByScope().satisfiedBy(MainActivity.class, OtherActivity.class);
+```
+
+In the consuming code:
+```Java
+// MainActivity
+@Inject
+private MyDependency dependency; // Requires Context in constructor.
+
+protected void onCreate(Bundle savedInstanceState){
+    super.onCreate(savedInstanceState);
+    jinjectsu.beginScope(this); // The scope context is now MainActivity
+    jinjectsu.inject(this); // The dependecy is satisfied by injecting MainActivity into MyDependency as Context
+}
+```
+
 ## Unit test setup
 Jinjectsu provides the *validateTypeRegistration* helper to help you ensure that your container is not missing any dependency registrations.
 
@@ -94,25 +117,3 @@ public void givenJinjectsuContainer_WhenValidatingRegistration_ReturnsValid() {
 }
 ```
 *Take care not to use dryRun() in actual production code as singletons will be created and every constructor in your dependency tree will be invoked.*
-
-## Upcoming
-The next feature to be completed is the concept of scope contexts. Although this has been partially (and generically) implemented, the main idea is to support Android context injection. Consider the following:
-
-```Java
-@Inject
-private MyDependency dependency;
-
-protected void onCreate(Bundle savedInstanceState){
-    super.onCreate(savedInstanceState);
-    jinjectsu.beginScope(this);
-    jinjectsu.inject(this);
-}
-```
-
-Given the activity context is now bound to the scope, any dependency on an Android *Context* can now be constructor injected. Your presenter (or other dependency) could for example be defined as:
-
-```Java
-public MyDependency(IService someService, Context context){
-    ...
-}
-```
