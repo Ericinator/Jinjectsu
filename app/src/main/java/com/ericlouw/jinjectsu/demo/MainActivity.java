@@ -20,8 +20,8 @@ public class MainActivity extends AppCompatActivity implements IExampleView{
 
         this.textView = (TextView) this.findViewById(R.id.text_box);
 
-        InjectionContainer.getInstalledInstance().beginScope(this);
-        InjectionContainer.getInstalledInstance().inject(this);
+        InjectionContainer.getInstalledInstance(this).beginScope(this);
+        InjectionContainer.getInstalledInstance(this).inject(this);
 
         this.presenter.takeView(this);
     }
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements IExampleView{
     @Override
     protected  void onDestroy(){
         super.onDestroy();
-        InjectionContainer.getInstalledInstance().endScope();
+        InjectionContainer.getInstalledInstance(this).endScope();
     }
 
     @Override

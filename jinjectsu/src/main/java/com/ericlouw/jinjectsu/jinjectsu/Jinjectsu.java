@@ -15,6 +15,7 @@ import com.ericlouw.jinjectsu.jinjectsu.exceptions.InjectionException;
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.TypeAlreadyRegisteredException;
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.UnregisteredTypeException;
 import com.ericlouw.jinjectsu.jinjectsu.interfaces.IFactoryMethod;
+import com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeBinder;
 
 public class Jinjectsu {
     InstanceContainer instanceContainer;
@@ -61,7 +62,7 @@ public class Jinjectsu {
 
     }
 
-    public com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeBinder bind(Class abstractType) {
+    public ITypeBinder bind(Class abstractType) {
         if(this.registrationTypeMap.containsKey(abstractType)){
             throw new TypeAlreadyRegisteredException(String.format("Type %s has already been registered under lifestyle %s." ,abstractType.getName(), this.registrationTypeMap.get(abstractType).toString()));
         }
@@ -185,7 +186,13 @@ public class Jinjectsu {
     }
 
     Class[] getConstructorDependenciesForType(Class type) {
-        Constructor constructor = type.getDeclaredConstructors()[0];
+        Constructor[] constructors = type.getDeclaredConstructors();
+
+        if(constructors.length == 0){
+            return new Class[0];
+        }
+
+        Constructor constructor = constructors[0];
 
         return constructor.getParameterTypes();
     }
