@@ -5,11 +5,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.ericlouw.jinjectsu.jinjectsu.configuration.IJinjectsuConfiguration;
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.ConstructorResolutionException;
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.InjectionException;
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.TypeAlreadyRegisteredException;
@@ -24,8 +24,10 @@ public class Jinjectsu {
     ScopedContainer scopedContainer;
     ScopeContextContainer scopeContextContainer;
     Map<Class, RegistrationType> registrationTypeMap;
+
     private Map<RegistrationType, com.ericlouw.jinjectsu.jinjectsu.interfaces.ITypeResolver> resolverMap;
     private CyclicDependencyChecker cyclicDependencyChecker;
+    private Class injectionAnnotation;
 
     public Jinjectsu() {
         this.instanceContainer = new InstanceContainer();
@@ -40,14 +42,20 @@ public class Jinjectsu {
         this.resolverMap.put(RegistrationType.SINGLETON, this.singletonContainer);
         this.resolverMap.put(RegistrationType.SCOPED, this.scopedContainer);
         this.resolverMap.put(RegistrationType.SCOPE_CONTEXT, this.scopeContextContainer);
+        this.injectionAnnotation = Inject.class;
         this.cyclicDependencyChecker = new CyclicDependencyChecker();
+    }
+
+    public Jinjectsu(IJinjectsuConfiguration configuration){
+        this();
+        injectionAnnotation = configuration.getInjectionAnnotation();
     }
 
     public void inject(Object target) {
         Field[] fields = target.getClass().getDeclaredFields();
 
         for (Field field : fields) {
-            if (!field.isAnnotationPresent(Inject.class)) {
+            if (!field.isAnnotationPresent(injectionAnnotation)) {
                 continue;
             }
 
@@ -59,7 +67,6 @@ public class Jinjectsu {
                 throw new InjectionException(String.format("Could not inject property %s of type %s because it is inaccessible.", field.getName(), target.getClass().getName()), e);
             }
         }
-
     }
 
     public ITypeBinder bind(Class abstractType) {

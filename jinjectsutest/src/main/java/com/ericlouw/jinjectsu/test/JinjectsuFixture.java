@@ -1,9 +1,14 @@
 package com.ericlouw.jinjectsu.test;
 
+import com.ericlouw.jinjectsu.jinjectsu.configuration.IJinjectsuConfiguration;
 import com.ericlouw.jinjectsu.jinjectsu.Jinjectsu;
 import com.ericlouw.jinjectsu.jinjectsu.JinjectsuAnalyzer;
+import com.ericlouw.jinjectsu.jinjectsu.configuration.JinjectsuConfiguration;
+import com.ericlouw.jinjectsu.jinjectsu.exceptions.InvalidAnnotationClassException;
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.InvalidScopeContextException;
 import com.ericlouw.jinjectsu.jinjectsu.exceptions.InvalidScopeException;
+import com.ericlouw.jinjectsu.test.testmodels.CustomAnnotationModel;
+import com.ericlouw.jinjectsu.test.testmodels.CustomAnnotationTest;
 import com.ericlouw.jinjectsu.test.testmodels.CyclicDependencyA;
 import com.ericlouw.jinjectsu.test.testmodels.CyclicDependencyB;
 import com.ericlouw.jinjectsu.test.testmodels.DependencyWithConstructorException;
@@ -461,5 +466,32 @@ public class JinjectsuFixture {
 
         Assert.assertEquals(resolved.getClass(), TestConcreteC.class);
         Assert.assertEquals(resolved2.getClass(), TestConcreteC2.class);
+    }
+
+    @Test
+    public void givenJinjectsu_WhenInjectingIntoCustomAnnotation_InjectsCorrectly(){
+        Jinjectsu jinjectsu = new Jinjectsu(new JinjectsuConfiguration().withCustomAnnotation(CustomAnnotationTest.class));
+
+        jinjectsu.bind(ITestInterfaceC.class).lifestyleTransient(TestConcreteC.class);
+
+        CustomAnnotationModel testModel = new CustomAnnotationModel();
+
+        jinjectsu.inject(testModel);
+
+        Assert.assertNotNull(testModel.dependency1);
+        Assert.assertNull(testModel.dependency2);
+    }
+
+    @Test
+    public void givenJinjectsuConfiguration_WhenSettingInvalidCustomAnnotationType_ThrowsInvalidAnnotationException(){
+        JinjectsuConfiguration config = new JinjectsuConfiguration();
+
+        try{
+            config.withCustomAnnotation(TestConcreteC.class);
+            Assert.assertTrue(false);
+        }
+        catch(InvalidAnnotationClassException e){
+            Assert.assertTrue(true);
+        }
     }
 }
