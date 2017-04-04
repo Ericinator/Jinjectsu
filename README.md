@@ -87,13 +87,12 @@ protected void onCreate(Bundle savedInstanceState){
 }
 ```
 ## Custom annotation configuration
-Jinjectsu uses the javax.inject.Inject annotation for property injection by default. This may cause some conflicts with other injection libraries such as Butterknife. It is possible to configure the annotation to be used for property injection like so:
+Jinjectsu uses the javax.inject.Inject annotation for property injection by default. This may cause some conflicts with other injection libraries (if you have perhaps a view injector for example that will try to bind views using @Inject). It is possible to configure the annotation to be used for property injection like so:
 ```Java
 JinjectsuConfiguration config = new JinjectsuConfiguration().withCustomAnnotation(MyAnnotation.class);
 
 Jinjectsu container = new Jinjectsu(config);
 ```
-Any configuration object that implements *IJinjectsuConfiguration* can be used to setup Jinjectsu.
 
 ## Unit test setup
 Jinjectsu provides the *validateTypeRegistration* helper to help you ensure that your container is not missing any dependency registrations.
