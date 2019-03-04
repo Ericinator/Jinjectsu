@@ -27,6 +27,22 @@ protected void onCreate(Bundle savedInstanceState){
 ```
 The initial injection happens through property injection. From there on out the dependency tree is resolved through constructor injection.
 
+Alternatively, if you would like to keep Jinsectsu out of most of your project, you can use the Application.ActivityLifecycleCallbacks interface:
+
+```Java
+@Override
+public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+    this.jinjectsu.beginScope(activity);
+    this.jinjectsu.inject(activity);
+}
+//...
+@Override
+public void onActivityDestroyed(Activity activity) {
+    this.jinjectsu.endScope();
+}
+```
+Just be careful with activity stacks. You may need to implement a lookup mechanism to ensure that activities only end their own scopes.
+
 The repo contains an example app to show usage in more detail.
 
 ## Multiple lifecycle support
@@ -111,6 +127,7 @@ public void givenJinjectsuContainer_WhenValidatingRegistration_ReturnsValid() {
 ```
 
 Additionally the *dryRun* method can be used to initiate a full dependency tree resolution in a unit test. This can be useful to identify erronous constructor logic.
+
 ```Java
 @Test
 public void givenJinjectsuContainer_WhenValidatingRegistration_ReturnsValid() {
