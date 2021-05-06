@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/JInjectsu.iml" filepath="$PROJECT_DIR$/.idea/JInjectsu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/JInjectsu.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/JInjectsu.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/jinjectsu/JInjectsu.jinjectsu.iml" filepath="$PROJECT_DIR$/.idea/modules/jinjectsu/JInjectsu.jinjectsu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/jinjectsutest/JInjectsu.jinjectsutest.iml" filepath="$PROJECT_DIR$/.idea/modules/jinjectsutest/JInjectsu.jinjectsutest.iml" />
+    </modules>
+  </component>
+</project>
