@@ -11,7 +11,4 @@ dependencies {
     compile 'junit:junit:4.12'
     compile 'javax.inject:javax.inject:1'
 }
-task wrapper(type: Wrapper){
-    gradleVersion = '4.1.2'
-}
 
